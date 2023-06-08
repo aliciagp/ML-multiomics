@@ -1,0 +1,20 @@
+Steps followed to get the results for the ML models:
+
+1. Data preparation:
+•	replace missing values by using the ‘k-nearest neighbours’ method
+•	normalise all values with the min-max method 
+•	shuffle the dataset for a more reliable distribution of the data
+ 
+2. Run each algorithm for each dataset in separate files:
+•	load data and apply rebalancing with SMOTE if necessary
+•	split the dataset into training and test sets
+•	fit the model to the dataset
+•	select hyperparameters
+•	run GridSearch with cross-validation to get best model - repeat previous step if maximum value of one of the parameters is returned as highest accuracy 
+
+
+3. Get output from the models by running remaining cells in the files:
+•	accuracy on test set
+•	ROC curve (with cross-validation for binary datasets / single plot for multi-class) 
+•	calculate and plot features of importance
+•	plot ROC curve with shuffle-split method for binary datasets to validate results
