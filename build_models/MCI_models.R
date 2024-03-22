@@ -1,28 +1,24 @@
-# Load libraries
+# Load libraries ----
 library(caret)
 library(doParallel)
 library(data.table)
 library(readxl)
 library(writexl)
 
-# Load data
+# Load data ----
 data <- readRDS(paste0(data_dir, "file.rds"))
 
-# Use all data for training
+# Use all data for training ----
 train <- data
 
-# Apply downsampling to address classes imbalance
+# Apply downsampling to address classes imbalance ----
 dim(train)
 train_down <- downSample(train, train$Diagnosis2)
 train_down$Class <- NULL
 dim(train_down)
 train <- train_down
 
-# Check that classes are balanced now
-table(train$Diagnosis2)
-
-
-# Define the same train control for all the models
+# trainControl ----
 set.seed(1234)
 fitControl <- trainControl(method = "repeatedcv",
                            number = 3,
@@ -32,7 +28,7 @@ fitControl <- trainControl(method = "repeatedcv",
                            summaryFunction = twoClassSummary,
                            savePredictions = T)
 
-# Define our own grid for hyperparameter tuning for machine learning models
+# Define our own grid for hyperparameter tuning for machine learning models ----
 grid_ridge <- expand.grid(.alpha=0,
                           .lambda=10^seq(-3, -1, length =25))
 default <- round(sqrt(ncol(train)),0)
@@ -41,10 +37,8 @@ grid_rf <- expand.grid(.mtry=seq(default-20, default+20, 10))
 grid_mlp <- expand.grid(size = seq(5, 15, 5),
                         decay = 10^seq(-3, -6, length = 4))
 
-
-
-# Train the models
-## Logistic regression
+# Train the models ----
+## Logistic regression ----
 ridge <- train(x=train[, -match("Diagnosis2", colnames(train))],
                y=train$Diagnosis2,
                trControl = fitControl,
@@ -57,7 +51,7 @@ ridge <- train(x=train[, -match("Diagnosis2", colnames(train))],
 saveRDS(ridge, paste0(models_dir, "ridge_MCI.rds"))
 
 
-## Random forest
+## Random forest ----
 rf <- train(x=train[, -match("Diagnosis2", colnames(train))],
             y=train$Diagnosis2,
             trControl = fitControl,
@@ -70,7 +64,7 @@ rf <- train(x=train[, -match("Diagnosis2", colnames(train))],
 saveRDS(rf, paste0(models_dir, "rf_MCI.rds"))
 
 
-## Support vector machines
+## Support vector machines ----
 svm <- train(x=train[, -match("Diagnosis2", colnames(train))],
              y=train$Diagnosis2,
              trControl = fitControl,
@@ -82,7 +76,7 @@ svm <- train(x=train[, -match("Diagnosis2", colnames(train))],
 saveRDS(svm, paste0(models_dir, "svm_MCI.rds"))
 
 
-## mlp
+## Multilayer perceptron ----
 mlp <- train(x=train[, -match("Diagnosis2", colnames(train))],
              y=train$Diagnosis2,
              trControl = fitControl,
